@@ -1,0 +1,131 @@
+{
+  "name": "HackIAthon - Auditor Agéntico de Facturación de Siniestros",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "auditar-siniestro",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "7336d7a5-ac8d-49e5-b50f-ed519e1b19c0",
+      "name": "Webhook",
+      "webhookId": "df1517e0-8963-4bb9-a200-d61c970752ee"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ ({\n  status: \"AUDITORIA_COMPLETADA\",\n  factura_id: $(\"Code in JavaScript\").item.json.factura_id,\n  siniestro_id: $(\"Code in JavaScript\").item.json.siniestro_id,\n  taller: $(\"Code in JavaScript\").item.json.taller,\n  estado: $(\"Code in JavaScript\").item.json.estado,\n  riesgo: $(\"Code in JavaScript\").item.json.riesgo,\n  total_facturado: $(\"Code in JavaScript\").item.json.resumen.total_facturado,\n  monto_sobrecosto: $(\"Code in JavaScript\").item.json.resumen.monto_sobrecosto,\n  monto_posible_duplicado: $(\"Code in JavaScript\").item.json.resumen.monto_posible_duplicado,\n  monto_total_observado: $(\"Code in JavaScript\").item.json.resumen.monto_total_observado,\n  requiere_revision_humana: $(\"Code in JavaScript\").item.json.requiere_revision_humana,\n  analisis_ia: $json.content\n}) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        832,
+        0
+      ],
+      "id": "a0651030-8040-430e-bd72-a86adf1a2c85",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Obtener información recibida desde el Webhook\nconst entrada = $input.first().json;\n\n// El POST del Webhook viene dentro de body\nconst factura = entrada.body ?? entrada;\n\n// Tarifario autorizado de prueba\nconst tarifario = {\n  \"REP-001\": {\n    descripcion: \"Reparacion de parachoques\",\n    precio_maximo: 150\n  },\n  \"PIN-001\": {\n    descripcion: \"Pintura de pieza\",\n    precio_maximo: 120\n  },\n  \"MO-001\": {\n    descripcion: \"Mano de obra mecanica\",\n    precio_maximo: 45\n  },\n  \"REP-002\": {\n    descripcion: \"Reemplazo de faro\",\n    precio_maximo: 180\n  }\n};\n\n// Variables de auditoria\nconst hallazgos = [];\nconst codigosProcesados = new Set();\n\nlet montoSobrecosto = 0;\nlet montoDuplicados = 0;\n\n// Analizar los conceptos de la factura\nfor (const item of factura.items ?? []) {\n\n  const codigo = item.codigo;\n  const cantidad = Number(item.cantidad ?? 0);\n  const precio = Number(item.precio_unitario ?? 0);\n\n  // Validar existencia en tarifario\n  if (!tarifario[codigo]) {\n\n    hallazgos.push({\n      tipo: \"FUERA_TARIFARIO\",\n      codigo: codigo,\n      descripcion: item.descripcion,\n      detalle: \"El concepto no existe en el tarifario autorizado\"\n    });\n\n  } else {\n\n    const precioPermitido = tarifario[codigo].precio_maximo;\n\n    // Detectar sobrecostos\n    if (precio > precioPermitido) {\n\n      const diferencia = (precio - precioPermitido) * cantidad;\n\n      montoSobrecosto += diferencia;\n\n      hallazgos.push({\n        tipo: \"SOBRECOSTO\",\n        codigo: codigo,\n        descripcion: item.descripcion,\n        precio_facturado: precio,\n        precio_maximo: precioPermitido,\n        cantidad: cantidad,\n        diferencia: diferencia\n      });\n    }\n  }\n\n  // Detectar posibles duplicados\n  if (codigosProcesados.has(codigo)) {\n\n    const impacto = precio * cantidad;\n\n    montoDuplicados += impacto;\n\n    hallazgos.push({\n      tipo: \"POSIBLE_DUPLICADO\",\n      codigo: codigo,\n      descripcion: item.descripcion,\n      cantidad: cantidad,\n      precio_unitario: precio,\n      impacto: impacto\n    });\n\n  } else {\n\n    codigosProcesados.add(codigo);\n\n  }\n}\n\n// Clasificacion inicial\nlet estado = \"PREVALIDADA\";\nlet riesgo = \"BAJO\";\n\nif (hallazgos.length > 0) {\n  estado = \"REVISION_REQUERIDA\";\n  riesgo = \"MEDIO\";\n}\n\nif (\n  hallazgos.some(\n    h => h.tipo === \"SOBRECOSTO\" ||\n         h.tipo === \"POSIBLE_DUPLICADO\"\n  )\n) {\n  riesgo = \"ALTO\";\n}\n\n// Construir resultado\nreturn [\n  {\n    json: {\n      auditoria_id: \"AUD-\" + (factura.factura_id ?? \"SIN-ID\"),\n      factura_id: factura.factura_id,\n      siniestro_id: factura.siniestro_id,\n      taller: factura.taller,\n\n      estado: estado,\n      riesgo: riesgo,\n\n      resumen: {\n        total_facturado: Number(factura.total_facturado ?? 0),\n        cantidad_items: factura.items?.length ?? 0,\n        cantidad_hallazgos: hallazgos.length,\n        monto_sobrecosto: montoSobrecosto,\n        monto_posible_duplicado: montoDuplicados,\n        monto_total_observado: montoSobrecosto + montoDuplicados\n      },\n\n      hallazgos: hallazgos,\n\n      requiere_revision_humana: hallazgos.length > 0\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "34f74c51-f8ef-4a77-b3d8-92277a8fbc57",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "qwen3:0.6b",
+          "mode": "list",
+          "cachedResultName": "qwen3:0.6b"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Eres un asistente de auditoría de facturación de siniestros.\n\nTu única función es explicar los resultados proporcionados por un motor determinístico.\n\nREGLAS OBLIGATORIAS:\n1. Utiliza exclusivamente la información recibida.\n2. No inventes causas, eventos, documentos ni irregularidades adicionales.\n3. No recalcules montos.\n4. No cambies la clasificación de riesgo.\n5. No afirmes que existe fraude.\n6. No autorices ni rechaces pagos.\n7. Un POSIBLE_DUPLICADO debe describirse únicamente como posible duplicado pendiente de validación humana.\n8. Un SOBRECOSTO debe describirse utilizando exactamente el precio facturado, precio máximo permitido y diferencia proporcionados.\n9. Si no existe evidencia para una conclusión, no la menciones.\n10. Responde únicamente en español.\n\nDATOS:\n\nFactura: {{ $json.factura_id }}\nSiniestro: {{ $json.siniestro_id }}\nTaller: {{ $json.taller }}\nEstado: {{ $json.estado }}\nRiesgo: {{ $json.riesgo }}\n\nTotal facturado: ${{ $json.resumen.total_facturado }}\nCantidad de conceptos: {{ $json.resumen.cantidad_items }}\nCantidad de hallazgos: {{ $json.resumen.cantidad_hallazgos }}\nSobrecosto: ${{ $json.resumen.monto_sobrecosto }}\nPosible duplicado: ${{ $json.resumen.monto_posible_duplicado }}\nMonto total observado: ${{ $json.resumen.monto_total_observado }}\n\nHALLAZGOS DEL MOTOR:\n{{ JSON.stringify($json.hallazgos) }}\n\nGenera únicamente:\n\nRESUMEN:\nResume el resultado de la auditoría en máximo 2 oraciones.\n\nHALLAZGOS:\nDescribe cada hallazgo utilizando solamente los datos suministrados.\n\nRECOMENDACIÓN:\nIndica qué información debe validar un auditor humano antes de continuar."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.ollama",
+      "typeVersion": 1,
+      "position": [
+        448,
+        0
+      ],
+      "id": "cdf81dcd-57b9-4b80-bc5b-30f264ec91ee",
+      "name": "Message a model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "WnkBrAyBcWXx4bWV",
+          "name": "Ollama account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "01a266a6-f808-450d-9168-297d864e86ba",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "38ec876306692f59af115d47c0173898ccf09498d7a211b0a7b2dfc5d9e68bc4"
+  },
+  "nodeGroups": [],
+  "id": "zflLci3vU042t6k1",
+  "tags": []
+}

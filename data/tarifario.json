@@ -1,0 +1,27 @@
+{
+  "version": "2026.1",
+  "moneda": "USD",
+  "descripcion": "Tarifario sintetico utilizado exclusivamente para demostracion del HackIAthon.",
+  "items": [
+    {
+      "codigo": "REP-001",
+      "descripcion": "Reparacion de parachoques",
+      "precio_maximo": 150
+    },
+    {
+      "codigo": "PIN-001",
+      "descripcion": "Pintura de pieza",
+      "precio_maximo": 120
+    },
+    {
+      "codigo": "MO-001",
+      "descripcion": "Mano de obra mecanica",
+      "precio_maximo": 45
+    },
+    {
+      "codigo": "REP-002",
+      "descripcion": "Reemplazo de faro",
+      "precio_maximo": 180
+    }
+  ]
+}

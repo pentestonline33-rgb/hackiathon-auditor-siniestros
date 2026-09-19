@@ -1,0 +1,37 @@
+{
+  "factura_id": "FAC-2026-00125",
+  "siniestro_id": "SIN-2026-00987",
+  "taller": "Taller Demo Panama",
+  "vehiculo": {
+    "marca": "Toyota",
+    "modelo": "Corolla",
+    "anio": 2022
+  },
+  "items": [
+    {
+      "codigo": "REP-001",
+      "descripcion": "Reparacion de parachoques",
+      "cantidad": 1,
+      "precio_unitario": 150
+    },
+    {
+      "codigo": "PIN-001",
+      "descripcion": "Pintura de parachoques",
+      "cantidad": 1,
+      "precio_unitario": 210
+    },
+    {
+      "codigo": "REP-002",
+      "descripcion": "Reemplazo de faro",
+      "cantidad": 2,
+      "precio_unitario": 180
+    },
+    {
+      "codigo": "REP-002",
+      "descripcion": "Reemplazo de faro",
+      "cantidad": 2,
+      "precio_unitario": 180
+    }
+  ],
+  "total_facturado": 1080
+}

@@ -1,5 +1,5 @@
 ﻿const WEBHOOK_URL =
-    "http://localhost:5678/webhook/auditar-siniestro";
+    "https://psychological-annotation-evolution-writer.trycloudflare.com/webhook/auditar-siniestro";
 
 const form = document.getElementById("auditForm");
 const itemsBody = document.getElementById("itemsBody");
@@ -20,7 +20,7 @@ addItemButton?.addEventListener("click", () => {
             <input
                 type="text"
                 class="item-code"
-                placeholder="CÃ³digo"
+                placeholder="Código"
                 required
             >
         </td>
@@ -29,7 +29,7 @@ addItemButton?.addEventListener("click", () => {
             <input
                 type="text"
                 class="item-description"
-                placeholder="DescripciÃ³n"
+                placeholder="Descripción"
                 required
             >
         </td>
@@ -61,7 +61,7 @@ addItemButton?.addEventListener("click", () => {
                 class="remove-item"
                 title="Eliminar concepto"
             >
-                Ã—
+                ×
             </button>
         </td>
     `;
@@ -100,7 +100,7 @@ function buildInvoice() {
 
     const items = Array.from(rows).map((row) => {
 
-        // Tomamos los 4 inputs de cada fila por su posiciÃ³n
+        // Tomamos los 4 inputs de cada fila por su posición
         const inputs = row.querySelectorAll("input");
 
         return {
@@ -174,9 +174,9 @@ form?.addEventListener("submit", async (event) => {
         console.error(error);
 
         alert(
-            "No fue posible ejecutar la auditorÃ­a.\n\n" +
-            "Comprueba que n8n estÃ© ejecutÃ¡ndose y que " +
-            "el Webhook estÃ© esperando una solicitud de prueba."
+            "No fue posible ejecutar la auditoría.\n\n" +
+            "Comprueba que n8n esté ejecutándose y que " +
+            "el Webhook esté esperando una solicitud de prueba."
         );
 
     } finally {
@@ -455,3 +455,6 @@ function formatMoney(value) {
         }
     ).format(Number(value || 0));
 }
+
+
+

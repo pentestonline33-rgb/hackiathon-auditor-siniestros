@@ -1,228 +1,100 @@
-\# Pruebas - Auditor Agéntico de Facturación de Siniestros
+# Pruebas funcionales
 
+## Auditor Agéntico de Facturación de Siniestros
 
+Este documento registra las pruebas funcionales realizadas sobre el prototipo desarrollado para el HackIAthon.
 
-\## Caso de prueba 01 - Factura con anomalías
+El objetivo de las pruebas es comprobar que el motor determinístico puede identificar inconsistencias en la facturación y que el agente de IA puede explicar los resultados sin modificar los cálculos ni tomar decisiones de autorización o rechazo.
 
+---
 
+## Caso de prueba 01 — Factura con hallazgos
 
-\### Objetivo
+### Datos evaluados
 
+- Total facturado: $1,080.00
+- Conceptos facturados: 4
+- Se incluyó un precio superior al tarifario.
+- Se incluyó un concepto repetido para simular un posible duplicado.
 
+### Resultado esperado
 
-Validar que el agente pueda detectar automáticamente sobrecostos y posibles conceptos duplicados antes de la revisión humana.
+El sistema debe identificar:
 
+- SOBRECOSTO
+- POSIBLE_DUPLICADO
+- Estado: REVISION_REQUERIDA
+- Riesgo: ALTO
+- Revisión humana requerida
 
+### Resultado obtenido
 
-\### Datos de entrada
+- Total facturado: $1,080.00
+- Monto observado: $450.00
+- Cantidad de hallazgos: 2
+- Sobrecosto detectado: $90.00
+- Posible duplicado: $360.00
+- Estado: REVISION_REQUERIDA
+- Riesgo: ALTO
 
+El agente de IA explicó los resultados producidos por el motor determinístico sin modificar los montos calculados.
 
+### Evidencia
 
-Factura:
+![Auditoría con hallazgos](../screenshots/01-auditoria-con-hallazgos.png)
 
+---
 
+## Caso de prueba 02 — Factura sin hallazgos
 
-`FAC-2026-00125`
+### Datos evaluados
 
+Se modificaron los conceptos de la factura para mantenerlos dentro del tarifario y eliminar posibles duplicados.
 
+### Resultado esperado
 
-Siniestro:
+El sistema no debe generar observaciones y la factura debe quedar prevalidada.
 
+### Resultado obtenido
 
+- Total facturado: $450.00
+- Monto observado: $0.00
+- Cantidad de hallazgos: 0
+- Estado: PREVALIDADA
+- Riesgo: BAJO
 
-`SIN-2026-00987`
+El motor determinístico no detectó hallazgos y el agente de IA generó una explicación consistente con ese resultado.
 
+### Evidencia
 
+![Auditoría sin hallazgos](../screenshots/02-auditoria-sin-hallazgos.png)
 
-Taller:
+---
 
+## Validación del componente de IA
 
+El modelo de lenguaje se utiliza exclusivamente para explicar los resultados obtenidos por el motor determinístico.
 
-`Taller Demo Panama`
+El agente tiene instrucciones para:
 
+- No recalcular montos.
+- No modificar la clasificación de riesgo.
+- No inventar irregularidades.
+- No afirmar que existe fraude.
+- No autorizar ni rechazar pagos.
+- Mantener los posibles duplicados sujetos a validación humana.
 
+Esto permite separar las reglas de negocio y los cálculos determinísticos de la interpretación realizada mediante IA.
 
-Total facturado:
+---
 
+## Resultado general
 
+Las pruebas realizadas validaron los dos escenarios principales del prototipo:
 
-`$1,080.00`
+**Factura con inconsistencias → revisión humana requerida.**
 
+**Factura sin inconsistencias detectadas → prevalidación.**
 
-
-Cantidad de conceptos:
-
-
-
-`4`
-
-
-
-\---
-
-
-
-\## Anomalías incluidas intencionalmente
-
-
-
-\### Sobrecosto
-
-
-
-Concepto:
-
-
-
-`PIN-001 - Pintura de parachoques`
-
-
-
-Precio facturado:
-
-
-
-`$210.00`
-
-
-
-Precio máximo permitido:
-
-
-
-`$120.00`
-
-
-
-Diferencia detectada:
-
-
-
-`$90.00`
-
-
-
-\### Posible duplicado
-
-
-
-Concepto:
-
-
-
-`REP-002 - Reemplazo de faro`
-
-
-
-El concepto aparece repetido en la factura.
-
-
-
-Impacto económico identificado:
-
-
-
-`$360.00`
-
-
-
-\---
-
-
-
-\## Resultado del motor determinístico
-
-
-
-El motor de auditoría produjo:
-
-
-
-\- Total facturado: `$1,080.00`
-
-\- Cantidad de hallazgos: `2`
-
-\- Sobrecosto detectado: `$90.00`
-
-\- Posible duplicado: `$360.00`
-
-\- Monto total observado: `$450.00`
-
-\- Riesgo: `ALTO`
-
-\- Estado: `REVISION\_REQUERIDA`
-
-\- Requiere revisión humana: `true`
-
-
-
-\---
-
-
-
-\## Análisis mediante IA
-
-
-
-Después de ejecutar las reglas determinísticas, los resultados fueron enviados al modelo local ejecutado mediante Ollama.
-
-
-
-Modelo:
-
-
-
-`qwen3:0.6b`
-
-
-
-El modelo generó:
-
-
-
-\- Resumen de la auditoría.
-
-\- Explicación de los hallazgos.
-
-\- Recomendación para revisión humana.
-
-
-
-La IA no recalcula ni modifica los importes determinados por el motor de reglas.
-
-
-
-\---
-
-
-
-\## Resultado esperado
-
-
-
-La factura no debe rechazarse automáticamente.
-
-
-
-Debe quedar marcada como:
-
-
-
-`REVISION\_REQUERIDA`
-
-
-
-El auditor humano recibe los hallazgos y puede verificar la documentación antes de continuar con el proceso.
-
-
-
-\---
-
-
-
-\## Estado de la prueba
-
-
-
-\*\*PRUEBA EXITOSA\*\*
+En ambos escenarios la decisión final permanece bajo control humano.
 

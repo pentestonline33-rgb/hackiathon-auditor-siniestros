@@ -1,82 +1,78 @@
-\# 🤖 Auditor Agéntico de Facturación de Siniestros
+# 🤖 Auditor Agéntico de Facturación de Siniestros
 
+Solución desarrollada para el **HackIAthon 2026** orientada a la prevalidación automatizada de facturas asociadas a siniestros.
 
+El sistema combina un **motor determinístico de reglas** con **Inteligencia Artificial local**, permitiendo detectar sobrecostos, conceptos fuera de tarifario y posibles duplicados antes de la revisión de un auditor humano.
 
-Solución desarrollada para HackIAthon orientada a automatizar la revisión inicial de facturas asociadas a siniestros de seguros.
+> **Principio de diseño:** Las reglas detectan. La IA explica. El humano decide.
 
+---
 
+## 🎯 Problema
 
-El sistema analiza los conceptos facturados por talleres, compara los importes contra un tarifario de referencia, identifica posibles sobrecostos y cargos duplicados y utiliza un modelo de inteligencia artificial local para generar un análisis comprensible para el auditor humano.
+La revisión manual de facturas de talleres asociadas a siniestros puede requerir verificar múltiples conceptos, cantidades y tarifas antes de continuar con el proceso.
 
+Este prototipo automatiza una primera capa de auditoría para identificar inconsistencias y presentar los resultados de forma clara al auditor.
 
+La solución no autoriza ni rechaza pagos automáticamente.
 
-\## 🎯 Reto
+---
 
+## ✨ Funcionalidades
 
+- Recepción de facturas mediante API REST.
+- Comparación automática contra un tarifario.
+- Detección de sobrecostos.
+- Identificación de conceptos fuera del tarifario.
+- Identificación preliminar de posibles duplicados.
+- Cálculo del monto observado.
+- Clasificación de riesgo.
+- Generación de explicaciones mediante IA.
+- Ejecución local del modelo de lenguaje.
+- Interfaz web para demostración.
+- Revisión humana para casos con hallazgos.
 
-\*\*Reto 2 - Auditor Agéntico de Facturación de Siniestros\*\*
+---
 
-
-
-El objetivo es automatizar la auditoría de documentación y facturas enviadas por talleres a una aseguradora, verificando que los insumos y honorarios correspondan con el tarifario y con el siniestro reportado, permitiendo detectar discrepancias o posibles cargos duplicados antes de la revisión humana.
-
-
-
-\## 🧠 Arquitectura
-
-
+## 🧠 Arquitectura
 
 ```text
-
-Factura / Siniestro
-
-&#x20;       │
-
-&#x20;       ▼
-
-&#x20;   Webhook API
-
-&#x20;       │
-
-&#x20;       ▼
-
-&#x20;      n8n
-
-&#x20;       │
-
-&#x20;       ▼
-
-Motor determinístico
-
-&#x20;       │
-
-&#x20;       ├── Validación de tarifario
-
-&#x20;       ├── Detección de sobrecostos
-
-&#x20;       └── Detección de posibles duplicados
-
-&#x20;       │
-
-&#x20;       ▼
-
-&#x20;Ollama + Qwen
-
-&#x20;       │
-
-&#x20;       ▼
-
-&#x20;Análisis asistido por IA
-
-&#x20;       │
-
-&#x20;       ▼
-
-Resultado estructurado
-
-&#x20;       │
-
-&#x20;       ▼
-
-&#x20;Revisión humana
-
+┌──────────────────┐
+│   Frontend Web   │
+│ HTML/CSS/JS      │
+└────────┬─────────┘
+         │ POST /webhook/auditar-siniestro
+         ▼
+┌──────────────────┐
+│       n8n        │
+│   Orquestador    │
+└────────┬─────────┘
+         ▼
+┌──────────────────┐
+│ Motor de reglas  │
+│   JavaScript     │
+└────────┬─────────┘
+         │
+         ├── Tarifas
+         ├── Sobrecostos
+         ├── Duplicados
+         └── Riesgo
+         │
+         ▼
+┌──────────────────┐
+│   Qwen + Ollama  │
+│    IA Local      │
+└────────┬─────────┘
+         ▼
+┌──────────────────┐
+│ Respuesta JSON   │
+└────────┬─────────┘
+         ▼
+┌──────────────────┐
+│    Frontend      │
+│ Resultado final  │
+└────────┬─────────┘
+         ▼
+┌──────────────────┐
+│ Revisión humana  │
+└──────────────────┘

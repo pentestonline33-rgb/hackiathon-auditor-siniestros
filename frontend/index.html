@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Auditor IA | Facturación de Siniestros</title>
+
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+
+<header class="topbar">
+    <div class="brand">
+        <div class="brand-icon">AI</div>
+
+        <div>
+            <h1>Auditor IA</h1>
+            <span>Facturación de Siniestros</span>
+        </div>
+    </div>
+
+    <div class="system-status">
+        <span class="status-dot"></span>
+        Sistema operativo
+    </div>
+</header>
+
+
+<main class="app-container">
+
+    <!-- HERO -->
+
+    <section class="hero">
+
+        <div>
+            <span class="eyebrow">CENTRO DE CONTROL</span>
+
+            <h2>Auditoría inteligente de facturación</h2>
+
+            <p>
+                Validación automatizada de conceptos, tarifas y posibles
+                duplicados antes de la revisión humana.
+            </p>
+        </div>
+
+        <div class="hero-badge">
+            <span>IA LOCAL</span>
+            <strong>Qwen + Ollama</strong>
+        </div>
+
+    </section>
+
+
+    <!-- FORMULARIO -->
+
+    <section class="panel">
+
+        <div class="panel-header">
+
+            <div>
+                <span class="step">01</span>
+                <h3>Información del siniestro</h3>
+            </div>
+
+            <span class="required-label">
+                Datos de demostración
+            </span>
+
+        </div>
+
+
+        <form id="auditForm">
+
+            <div class="form-grid">
+
+                <div class="field">
+                    <label for="facturaId">Número de factura</label>
+
+                    <input
+                        id="facturaId"
+                        type="text"
+                        value="FAC-2026-00125"
+                        required
+                    >
+                </div>
+
+
+                <div class="field">
+                    <label for="siniestroId">Número de siniestro</label>
+
+                    <input
+                        id="siniestroId"
+                        type="text"
+                        value="SIN-2026-00987"
+                        required
+                    >
+                </div>
+
+
+                <div class="field">
+                    <label for="taller">Taller</label>
+
+                    <input
+                        id="taller"
+                        type="text"
+                        value="Taller Demo Panama"
+                        required
+                    >
+                </div>
+
+
+                <div class="field">
+                    <label for="totalFacturado">Total facturado (USD)</label>
+
+                    <input
+                        id="totalFacturado"
+                        type="number"
+                        value="1080"
+                        min="0"
+                        step="0.01"
+                        required
+                    >
+                </div>
+
+            </div>
+
+
+            <!-- CONCEPTOS -->
+
+            <div class="items-section">
+
+                <div class="section-title">
+
+                    <div>
+                        <span class="step">02</span>
+                        <h3>Conceptos facturados</h3>
+                    </div>
+
+                    <button
+                        type="button"
+                        id="addItem"
+                        class="btn-secondary"
+                    >
+                        + Agregar concepto
+                    </button>
+
+                </div>
+
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Descripción</th>
+                                <th>Cantidad</th>
+                                <th>Precio unitario</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+
+
+                        <tbody id="itemsBody">
+
+                            <tr>
+                                <td>
+                                    <input value="REP-001">
+                                </td>
+
+                                <td>
+                                    <input value="Reparación de parachoques">
+                                </td>
+
+                                <td>
+                                    <input
+                                        type="number"
+                                        value="1"
+                                        min="1"
+                                    >
+                                </td>
+
+                                <td>
+                                    <input
+                                        type="number"
+                                        value="150"
+                                        min="0"
+                                        step="0.01"
+                                    >
+                                </td>
+
+                                <td>
+                                    <button
+                                        type="button"
+                                        class="remove-item"
+                                    >
+                                        ×
+                                    </button>
+                                </td>
+                            </tr>
+
+
+                            <tr>
+                                <td>
+                                    <input value="PIN-001">
+                                </td>
+
+                                <td>
+                                    <input value="Pintura de parachoques">
+                                </td>
+
+                                <td>
+                                    <input
+                                        type="number"
+                                        value="1"
+                                        min="1"
+                                    >
+                                </td>
+
+                                <td>
+                                    <input
+                                        type="number"
+                                        value="210"
+                                        min="0"
+                                        step="0.01"
+                                    >
+                                </td>
+
+                                <td>
+                                    <button
+                                        type="button"
+                                        class="remove-item"
+                                    >
+                                        ×
+                                    </button>
+                                </td>
+                            </tr>
+
+
+                            <tr>
+                                <td>
+                                    <input value="REP-002">
+                                </td>
+
+                                <td>
+                                    <input value="Reemplazo de faro">
+                                </td>
+
+                                <td>
+                                    <input
+                                        type="number"
+                                        value="2"
+                                        min="1"
+                                    >
+                                </td>
+
+                                <td>
+                                    <input
+                                        type="number"
+                                        value="180"
+                                        min="0"
+                                        step="0.01"
+                                    >
+                                </td>
+
+                                <td>
+                                    <button
+                                        type="button"
+                                        class="remove-item"
+                                    >
+                                        ×
+                                    </button>
+                                </td>
+                            </tr>
+
+
+                            <tr>
+                                <td>
+                                    <input value="REP-002">
+                                </td>
+
+                                <td>
+                                    <input value="Reemplazo de faro">
+                                </td>
+
+                                <td>
+                                    <input
+                                        type="number"
+                                        value="2"
+                                        min="1"
+                                    >
+                                </td>
+
+                                <td>
+                                    <input
+                                        type="number"
+                                        value="180"
+                                        min="0"
+                                        step="0.01"
+                                    >
+                                </td>
+
+                                <td>
+                                    <button
+                                        type="button"
+                                        class="remove-item"
+                                    >
+                                        ×
+                                    </button>
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+            <!-- BOTÓN -->
+
+            <div class="audit-action">
+
+                <div class="security-message">
+                    <strong>Auditoría asistida por IA</strong>
+                    <span>
+                        Ninguna factura es rechazada automáticamente.
+                    </span>
+                </div>
+
+                <button
+                    id="auditButton"
+                    class="btn-primary"
+                    type="submit"
+                >
+                    <span>✦</span>
+                    Auditar factura
+                </button>
+
+            </div>
+
+        </form>
+
+    </section>
+
+
+    <!-- LOADING -->
+
+    <section
+        id="loadingPanel"
+        class="loading-panel hidden"
+    >
+
+        <div class="spinner"></div>
+
+        <h3>Analizando factura</h3>
+
+        <p>
+            El motor de reglas y el agente IA están
+            verificando los conceptos facturados.
+        </p>
+
+    </section>
+
+
+    <!-- RESULTADOS -->
+
+    <section
+        id="results"
+        class="results hidden"
+    >
+
+        <div class="results-header">
+
+            <div>
+                <span class="step">03</span>
+                <h3>Resultado de auditoría</h3>
+            </div>
+	    <span
+    		id="resultStatus"
+    		class="status-badge"
+	    >
+    		SIN EVALUAR
+	    </span>
+       
+        </div>
+
+
+        <div class="metrics">
+
+            <article class="metric-card">
+                <span>Total facturado</span>
+                <strong id="metricTotal">$0.00</strong>
+            </article>
+
+
+            <article class="metric-card">
+                <span>Monto observado</span>
+                <strong id="metricObserved">$0.00</strong>
+            </article>
+
+
+            <article class="metric-card">
+                <span>Hallazgos</span>
+                <strong id="metricFindings">0</strong>
+            </article>
+
+
+            <article class="metric-card risk-card">
+                <span>Nivel de riesgo</span>
+                <strong id="metricRisk">-</strong>
+            </article>
+
+        </div>
+
+
+        <div class="result-grid">
+
+            <!-- HALLAZGOS -->
+
+            <article class="result-card">
+
+                <div class="card-title">
+                    <div class="card-icon">!</div>
+
+                    <div>
+                        <h4>Hallazgos detectados</h4>
+                        <p>
+                            Resultado del motor determinístico
+                        </p>
+                    </div>
+                </div>
+
+                <div id="findingsList"></div>
+
+            </article>
+
+
+            <!-- IA -->
+
+            <article class="result-card ai-card">
+
+                <div class="card-title">
+                    <div class="card-icon ai-icon">AI</div>
+
+                    <div>
+                        <h4>Análisis del Agente IA</h4>
+                        <p>Qwen ejecutándose localmente</p>
+                    </div>
+                </div>
+
+                <div
+                    id="aiAnalysis"
+                    class="ai-analysis"
+                >
+                    Esperando análisis...
+                </div>
+
+            </article>
+
+        </div>
+
+
+        <div
+            id="humanReview"
+            class="human-review"
+        >
+
+            <div class="review-icon">✓</div>
+
+            <div>
+                <strong>Control humano</strong>
+
+                <p>
+                    Los hallazgos deben ser validados por un
+                    auditor antes de continuar con el proceso.
+                </p>
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<footer>
+
+    <span>
+        HackIAthon 2026 · Auditor Agéntico de Facturación de Siniestros
+    </span>
+
+    <span>
+        Motor determinístico + IA local
+    </span>
+
+</footer>
+
+
+<script src="js/app.js"></script>
+
+</body>
+</html>

@@ -1,5 +1,5 @@
 ﻿const WEBHOOK_URL =
-    "https://psychological-annotation-evolution-writer.trycloudflare.com/webhook/auditar-siniestro";
+    "https://api-auditor.shadowseclabs.xyz/webhook/auditar-siniestro";
 
 const form = document.getElementById("auditForm");
 const itemsBody = document.getElementById("itemsBody");
@@ -455,6 +455,7 @@ function formatMoney(value) {
         }
     ).format(Number(value || 0));
 }
+
 
 
 

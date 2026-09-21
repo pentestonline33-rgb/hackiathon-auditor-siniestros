@@ -4,504 +4,395 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Auditor IA | Facturación de Siniestros</title>
+    <title>Auditor | Facturación de Siniestros</title>
 
     <link rel="stylesheet" href="css/styles.css">
+
+    <!-- Aplica el tema guardado ANTES de pintar, para evitar parpadeo -->
+    <script>
+        (function () {
+            var saved;
+            try { saved = localStorage.getItem('auditor-ia-theme'); } catch (e) {}
+            var theme = saved || 'dark';
+            if (theme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+    </script>
 </head>
 
 <body>
 
-<header class="topbar">
-    <div class="brand">
-        <div class="brand-icon">AI</div>
+<!-- =========================================================
+     LOGIN
+     ========================================================= -->
 
-        <div>
-            <h1>Auditor IA</h1>
-            <span>Facturación de Siniestros</span>
-        </div>
-    </div>
+<div id="login-screen" class="login-screen">
 
-    <div class="system-status">
-        <span class="status-dot"></span>
-        Sistema operativo
-    </div>
-</header>
+    <div class="login-card-wrap">
 
-
-<main class="app-container">
-
-    <!-- HERO -->
-
-    <section class="hero">
-
-        <div>
-            <span class="eyebrow">CENTRO DE CONTROL</span>
-
-            <h2>Auditoría inteligente de facturación</h2>
-
-            <p>
-                Validación automatizada de conceptos, tarifas y posibles
-                duplicados antes de la revisión humana.
-            </p>
-        </div>
-
-        <div class="hero-badge">
-            <span>IA LOCAL</span>
-            <strong>Qwen + Ollama</strong>
-        </div>
-
-    </section>
-
-
-    <!-- FORMULARIO -->
-
-    <section class="panel">
-
-        <div class="panel-header">
-
-            <div>
-                <span class="step">01</span>
-                <h3>Información del siniestro</h3>
+        <div class="login-top-row">
+            <div class="login-brand">
+                <div class="brand-icon">A</div>
+                <span>Auditor</span>
             </div>
 
-            <span class="required-label">
-                Datos de demostración
-            </span>
-
+            <div class="theme-toggle" role="group" aria-label="Tema">
+                <button type="button" id="theme-btn-light" aria-label="Modo claro">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+                </button>
+                <button type="button" id="theme-btn-dark" aria-label="Modo oscuro">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg>
+                </button>
+            </div>
         </div>
 
+        <div class="login-card">
+            <h2>Iniciar sesión</h2>
+            <p class="login-sub">Entra con tu correo y contraseña para acceder al panel.</p>
 
-        <form id="auditForm">
+            <div class="login-error" id="login-error"></div>
 
-            <div class="form-grid">
-
-                <div class="field">
-                    <label for="facturaId">Número de factura</label>
-
-                    <input
-                        id="facturaId"
-                        type="text"
-                        value="FAC-2026-00125"
-                        required
-                    >
-                </div>
-
+            <form id="login-form" novalidate>
 
                 <div class="field">
-                    <label for="siniestroId">Número de siniestro</label>
-
-                    <input
-                        id="siniestroId"
-                        type="text"
-                        value="SIN-2026-00987"
-                        required
-                    >
+                    <label for="login-email">Correo</label>
+                    <input type="email" id="login-email" name="email" placeholder="tu@empresa.com" autocomplete="username" required>
                 </div>
 
-
-                <div class="field">
-                    <label for="taller">Taller</label>
-
-                    <input
-                        id="taller"
-                        type="text"
-                        value="Taller Demo Panama"
-                        required
-                    >
+                <div class="field" style="margin-top:14px;">
+                    <label for="login-password">Contraseña</label>
+                    <input type="password" id="login-password" name="password" placeholder="Mínimo 8 caracteres" autocomplete="current-password" required>
                 </div>
 
-
-                <div class="field">
-                    <label for="totalFacturado">Total facturado (USD)</label>
-
-                    <input
-                        id="totalFacturado"
-                        type="number"
-                        value="1080"
-                        min="0"
-                        step="0.01"
-                        required
-                    >
-                </div>
-
-            </div>
-
-
-            <!-- CONCEPTOS -->
-
-            <div class="items-section">
-
-                <div class="section-title">
-
-                    <div>
-                        <span class="step">02</span>
-                        <h3>Conceptos facturados</h3>
-                    </div>
-
-                    <button
-                        type="button"
-                        id="addItem"
-                        class="btn-secondary"
-                    >
-                        + Agregar concepto
-                    </button>
-
-                </div>
-
-
-                <div class="table-wrapper">
-
-                    <table>
-
-                        <thead>
-                            <tr>
-                                <th>Código</th>
-                                <th>Descripción</th>
-                                <th>Cantidad</th>
-                                <th>Precio unitario</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-
-
-                        <tbody id="itemsBody">
-
-                            <tr>
-                                <td>
-                                    <input value="REP-001">
-                                </td>
-
-                                <td>
-                                    <input value="Reparación de parachoques">
-                                </td>
-
-                                <td>
-                                    <input
-                                        type="number"
-                                        value="1"
-                                        min="1"
-                                    >
-                                </td>
-
-                                <td>
-                                    <input
-                                        type="number"
-                                        value="150"
-                                        min="0"
-                                        step="0.01"
-                                    >
-                                </td>
-
-                                <td>
-                                    <button
-                                        type="button"
-                                        class="remove-item"
-                                    >
-                                        ×
-                                    </button>
-                                </td>
-                            </tr>
-
-
-                            <tr>
-                                <td>
-                                    <input value="PIN-001">
-                                </td>
-
-                                <td>
-                                    <input value="Pintura de parachoques">
-                                </td>
-
-                                <td>
-                                    <input
-                                        type="number"
-                                        value="1"
-                                        min="1"
-                                    >
-                                </td>
-
-                                <td>
-                                    <input
-                                        type="number"
-                                        value="210"
-                                        min="0"
-                                        step="0.01"
-                                    >
-                                </td>
-
-                                <td>
-                                    <button
-                                        type="button"
-                                        class="remove-item"
-                                    >
-                                        ×
-                                    </button>
-                                </td>
-                            </tr>
-
-
-                            <tr>
-                                <td>
-                                    <input value="REP-002">
-                                </td>
-
-                                <td>
-                                    <input value="Reemplazo de faro">
-                                </td>
-
-                                <td>
-                                    <input
-                                        type="number"
-                                        value="2"
-                                        min="1"
-                                    >
-                                </td>
-
-                                <td>
-                                    <input
-                                        type="number"
-                                        value="180"
-                                        min="0"
-                                        step="0.01"
-                                    >
-                                </td>
-
-                                <td>
-                                    <button
-                                        type="button"
-                                        class="remove-item"
-                                    >
-                                        ×
-                                    </button>
-                                </td>
-                            </tr>
-
-
-                            <tr>
-                                <td>
-                                    <input value="REP-002">
-                                </td>
-
-                                <td>
-                                    <input value="Reemplazo de faro">
-                                </td>
-
-                                <td>
-                                    <input
-                                        type="number"
-                                        value="2"
-                                        min="1"
-                                    >
-                                </td>
-
-                                <td>
-                                    <input
-                                        type="number"
-                                        value="180"
-                                        min="0"
-                                        step="0.01"
-                                    >
-                                </td>
-
-                                <td>
-                                    <button
-                                        type="button"
-                                        class="remove-item"
-                                    >
-                                        ×
-                                    </button>
-                                </td>
-                            </tr>
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-            </div>
-
-
-            <!-- BOTÓN -->
-
-            <div class="audit-action">
-
-                <div class="security-message">
-                    <strong>Auditoría asistida por IA</strong>
-                    <span>
-                        Ninguna factura es rechazada automáticamente.
-                    </span>
-                </div>
-
-                <button
-                    id="auditButton"
-                    class="btn-primary"
-                    type="submit"
-                >
-                    <span>✦</span>
-                    Auditar factura
+                <button type="submit" class="btn-primary" id="login-submit" style="width:100%; margin-top:22px;">
+                    <span id="login-spinner" class="spinner login-spinner hidden"></span>
+                    <span>Entrar</span>
                 </button>
 
-            </div>
+            </form>
 
-        </form>
+            <div class="login-foot">¿Problemas para entrar? Contacta a tu administrador.</div>
+        </div>
 
-    </section>
+    </div>
 
-
-    <!-- LOADING -->
-
-    <section
-        id="loadingPanel"
-        class="loading-panel hidden"
-    >
-
-        <div class="spinner"></div>
-
-        <h3>Analizando factura</h3>
-
-        <p>
-            El motor de reglas y el agente IA están
-            verificando los conceptos facturados.
-        </p>
-
-    </section>
+</div>
 
 
-    <!-- RESULTADOS -->
+<!-- =========================================================
+     PANEL DE ADMINISTRADOR
+     ========================================================= -->
 
-    <section
-        id="results"
-        class="results hidden"
-    >
+<div id="admin-shell" class="admin-shell hidden">
 
-        <div class="results-header">
+    <aside class="sidebar">
 
+        <div class="sidebar-brand">
+            <div class="brand-icon">A</div>
             <div>
-                <span class="step">03</span>
-                <h3>Resultado de auditoría</h3>
+                <h1>Auditor</h1>
+                <span>Facturación de Siniestros</span>
             </div>
-	    <span
-    		id="resultStatus"
-    		class="status-badge"
-	    >
-    		SIN EVALUAR
-	    </span>
-       
         </div>
 
+        <nav class="sidebar-nav">
+            <button class="nav-item active" data-panel="auditorias">Auditorías</button>
+            <button class="nav-item" data-panel="historial">Historial</button>
+            <button class="nav-item" data-panel="talleres">Talleres</button>
+            <button class="nav-item" data-panel="configuracion">Configuración</button>
+            <button class="nav-item" data-panel="seguridad">Seguridad</button>
+        </nav>
 
-        <div class="metrics">
-
-            <article class="metric-card">
-                <span>Total facturado</span>
-                <strong id="metricTotal">$0.00</strong>
-            </article>
-
-
-            <article class="metric-card">
-                <span>Monto observado</span>
-                <strong id="metricObserved">$0.00</strong>
-            </article>
-
-
-            <article class="metric-card">
-                <span>Hallazgos</span>
-                <strong id="metricFindings">0</strong>
-            </article>
-
-
-            <article class="metric-card risk-card">
-                <span>Nivel de riesgo</span>
-                <strong id="metricRisk">-</strong>
-            </article>
-
+        <div class="sidebar-footer">
+            <div class="user-chip">
+                <div class="avatar" id="user-avatar">A</div>
+                <div>
+                    <strong id="user-name">Administrador</strong>
+                    <span>Admin · Administrador</span>
+                </div>
+            </div>
+            <button type="button" class="logout-btn" id="logout-btn">Cerrar sesión</button>
         </div>
 
+    </aside>
 
-        <div class="result-grid">
+    <div class="shell-main">
 
-            <!-- HALLAZGOS -->
+        <header class="shell-topbar">
+            <h2 id="panel-title">Auditorías</h2>
 
-            <article class="result-card">
+            <div class="shell-topbar-actions">
 
-                <div class="card-title">
-                    <div class="card-icon">!</div>
+                <div class="system-status">
+                    <span class="status-dot"></span>
+                    Sistema operativo
+                </div>
 
+                <div class="theme-toggle" role="group" aria-label="Tema">
+                    <button type="button" id="theme-btn-light-shell" aria-label="Modo claro">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+                    </button>
+                    <button type="button" id="theme-btn-dark-shell" aria-label="Modo oscuro">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg>
+                    </button>
+                </div>
+
+            </div>
+        </header>
+
+        <div class="shell-content">
+
+            <!-- ================= AUDITORÍAS ================= -->
+
+            <section id="panel-auditorias" class="content-panel">
+
+                <section class="hero">
                     <div>
-                        <h4>Hallazgos detectados</h4>
+                        <span class="eyebrow">CENTRO DE CONTROL</span>
+                        <h2>Auditoría inteligente de facturación</h2>
                         <p>
-                            Resultado del motor determinístico
+                            Validación automatizada de conceptos, tarifas y posibles
+                            duplicados antes de la revisión humana.
                         </p>
                     </div>
-                </div>
-
-                <div id="findingsList"></div>
-
-            </article>
+                </section>
 
 
-            <!-- IA -->
+                <section class="panel">
 
-            <article class="result-card ai-card">
-
-                <div class="card-title">
-                    <div class="card-icon ai-icon">AI</div>
-
-                    <div>
-                        <h4>Análisis del Agente IA</h4>
-                        <p>Qwen ejecutándose localmente</p>
+                    <div class="panel-header">
+                        <div>
+                            <span class="step">01</span>
+                            <h3>Información del siniestro</h3>
+                        </div>
                     </div>
-                </div>
 
-                <div
-                    id="aiAnalysis"
-                    class="ai-analysis"
-                >
-                    Esperando análisis...
-                </div>
 
-            </article>
+                    <form id="auditForm">
+
+                        <div class="form-grid">
+
+                            <div class="field">
+                                <label for="facturaId">Número de factura</label>
+                                <input id="facturaId" type="text" value="FAC-2026-00125" required>
+                            </div>
+
+                            <div class="field">
+                                <label for="siniestroId">Número de siniestro</label>
+                                <input id="siniestroId" type="text" value="SIN-2026-00987" required>
+                            </div>
+
+                            <div class="field">
+                                <label for="taller">Taller</label>
+                                <input id="taller" type="text" value="Taller Demo Panama" required>
+                            </div>
+
+                            <div class="field">
+                                <label for="totalFacturado">Total facturado (USD)</label>
+                                <input id="totalFacturado" type="number" value="1080" min="0" step="0.01" required>
+                            </div>
+
+                        </div>
+
+
+                        <div class="items-section">
+
+                            <div class="section-title">
+                                <div>
+                                    <span class="step">02</span>
+                                    <h3>Conceptos facturados</h3>
+                                </div>
+
+                                <button type="button" id="addItem" class="btn-secondary">+ Agregar concepto</button>
+                            </div>
+
+
+                            <div class="table-wrapper">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Código</th>
+                                            <th>Descripción</th>
+                                            <th>Cantidad</th>
+                                            <th>Precio unitario</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody id="itemsBody">
+                                        <tr>
+                                            <td><input value="REP-001"></td>
+                                            <td><input value="Reparación de parachoques"></td>
+                                            <td><input type="number" value="1" min="1"></td>
+                                            <td><input type="number" value="150" min="0" step="0.01"></td>
+                                            <td><button type="button" class="remove-item">×</button></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td><input value="PIN-001"></td>
+                                            <td><input value="Pintura de parachoques"></td>
+                                            <td><input type="number" value="1" min="1"></td>
+                                            <td><input type="number" value="210" min="0" step="0.01"></td>
+                                            <td><button type="button" class="remove-item">×</button></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td><input value="REP-002"></td>
+                                            <td><input value="Reemplazo de faro"></td>
+                                            <td><input type="number" value="2" min="1"></td>
+                                            <td><input type="number" value="180" min="0" step="0.01"></td>
+                                            <td><button type="button" class="remove-item">×</button></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td><input value="REP-002"></td>
+                                            <td><input value="Reemplazo de faro"></td>
+                                            <td><input type="number" value="2" min="1"></td>
+                                            <td><input type="number" value="180" min="0" step="0.01"></td>
+                                            <td><button type="button" class="remove-item">×</button></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+
+
+                        <div class="audit-action">
+                            <div class="security-message">
+                                <strong>Auditoría asistida</strong>
+                                <span>Ninguna factura es rechazada automáticamente.</span>
+                            </div>
+
+                            <button id="auditButton" class="btn-primary" type="submit">
+                                <span>✦</span>
+                                Auditar factura
+                            </button>
+                        </div>
+
+                    </form>
+
+                </section>
+
+
+                <section id="loadingPanel" class="loading-panel hidden">
+                    <div class="spinner"></div>
+                    <h3>Analizando factura</h3>
+                    <p>El motor de reglas está verificando los conceptos facturados.</p>
+                </section>
+
+
+                <section id="results" class="results hidden">
+
+                    <div class="results-header">
+                        <div>
+                            <span class="step">03</span>
+                            <h3>Resultado de auditoría</h3>
+                        </div>
+                        <span id="resultStatus" class="status-badge">SIN EVALUAR</span>
+                    </div>
+
+
+                    <div class="metrics">
+                        <article class="metric-card">
+                            <span>Total facturado</span>
+                            <strong id="metricTotal">$0.00</strong>
+                        </article>
+
+                        <article class="metric-card">
+                            <span>Monto observado</span>
+                            <strong id="metricObserved">$0.00</strong>
+                        </article>
+
+                        <article class="metric-card">
+                            <span>Hallazgos</span>
+                            <strong id="metricFindings">0</strong>
+                        </article>
+
+                        <article class="metric-card risk-card">
+                            <span>Nivel de riesgo</span>
+                            <strong id="metricRisk">-</strong>
+                        </article>
+                    </div>
+
+
+                    <div class="result-grid">
+
+                        <article class="result-card">
+                            <div class="card-title">
+                                <div class="card-icon">!</div>
+                                <div>
+                                    <h4>Hallazgos detectados</h4>
+                                    <p>Resultado del motor determinístico</p>
+                                </div>
+                            </div>
+
+                            <div id="findingsList"></div>
+                        </article>
+
+
+                        <article class="result-card ai-card">
+                            <div class="card-title">
+                                <div class="card-icon ai-icon">⚙</div>
+                                <div>
+                                    <h4>Análisis automático</h4>
+                                    <p>Motor de análisis local</p>
+                                </div>
+                            </div>
+
+                            <div id="aiAnalysis" class="ai-analysis">Esperando análisis...</div>
+                        </article>
+
+                    </div>
+
+
+                    <div id="humanReview" class="human-review">
+                        <div class="review-icon">✓</div>
+                        <div>
+                            <strong>Control humano</strong>
+                            <p>Los hallazgos deben ser validados por un auditor antes de continuar con el proceso.</p>
+                        </div>
+                    </div>
+
+                </section>
+
+            </section>
+
+
+            <!-- ================= PLACEHOLDERS ================= -->
+
+            <section id="panel-historial" class="content-panel hidden">
+                <div class="placeholder-panel">Historial — próximamente</div>
+            </section>
+
+            <section id="panel-talleres" class="content-panel hidden">
+                <div class="placeholder-panel">Talleres — próximamente</div>
+            </section>
+
+            <section id="panel-configuracion" class="content-panel hidden">
+                <div class="placeholder-panel">Configuración — próximamente</div>
+            </section>
+
+            <section id="panel-seguridad" class="content-panel hidden">
+                <div class="placeholder-panel">Seguridad — próximamente</div>
+            </section>
+
+
+            <footer class="shell-footer">
+                <span>HackIAthon 2026 · Auditor de Facturación de Siniestros</span>
+                <span>Motor determinístico + análisis local</span>
+            </footer>
 
         </div>
 
+    </div>
 
-        <div
-            id="humanReview"
-            class="human-review"
-        >
-
-            <div class="review-icon">✓</div>
-
-            <div>
-                <strong>Control humano</strong>
-
-                <p>
-                    Los hallazgos deben ser validados por un
-                    auditor antes de continuar con el proceso.
-                </p>
-            </div>
-
-        </div>
-
-    </section>
-
-</main>
+</div>
 
 
-<footer>
-
-    <span>
-        HackIAthon 2026 · Auditor Agéntico de Facturación de Siniestros
-    </span>
-
-    <span>
-        Motor determinístico + IA local
-    </span>
-
-</footer>
-
-
+<script src="js/theme.js"></script>
+<script src="js/auth.js"></script>
 <script src="js/app.js"></script>
 
 </body>
